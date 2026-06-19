@@ -1,0 +1,403 @@
+/* =========================================
+   RESET E VARIÁVEIS GERAIS
+========================================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    scroll-behavior: smooth;
+}
+
+:root {
+    --cor-primaria: #0f172a; 
+    --cor-secundaria: #6366f1; 
+    --cor-destaque: #ec4899; 
+    --cor-fundo: #f8fafc; 
+    --cor-texto: #334155; 
+    --cor-branca: #ffffff;
+    --gradiente-ia: linear-gradient(135deg, var(--cor-secundaria), var(--cor-destaque));
+}
+
+body {
+    background-color: var(--cor-fundo);
+    color: var(--cor-texto);
+}
+
+/* =========================================
+   CABEÇALHO E NAVEGAÇÃO
+========================================= */
+header {
+    background: var(--gradiente-ia);
+    color: var(--cor-branca);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 50px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+header .logo h1 {
+    font-size: 24px;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+}
+
+nav ul li a {
+    color: var(--cor-branca);
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+nav ul li a:hover {
+    color: #e2e8f0;
+}
+
+/* =========================================
+   SEÇÕES PRINCIPAIS E BOTÕES
+========================================= */
+section {
+    padding: 80px 20px;
+    text-align: center;
+    min-height: 70vh;
+}
+
+section h2 {
+    font-size: 32px;
+    margin-bottom: 20px;
+    color: var(--cor-primaria);
+}
+
+.hero {
+    background-color: var(--cor-branca);
+    padding: 100px 20px;
+}
+
+.hero p {
+    font-size: 18px;
+    margin-bottom: 30px;
+}
+
+.btn-comprar {
+    background: var(--gradiente-ia);
+    color: var(--cor-branca);
+    padding: 15px 35px;
+    text-decoration: none;
+    border-radius: 30px;
+    font-weight: bold;
+    font-size: 18px;
+    display: inline-block;
+    transition: all 0.3s ease;
+    border: none;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+}
+
+.btn-comprar:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(236, 72, 153, 0.5);
+}
+
+/* =========================================
+   CARDS DE PRODUTOS (FLEXBOX)
+========================================= */
+.container-cards {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+    margin-top: 40px;
+}
+
+.card {
+    background-color: var(--cor-branca);
+    width: 300px;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    border-top: 5px solid var(--cor-secundaria);
+    position: relative;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-12px);
+    box-shadow: 0 15px 35px rgba(99, 102, 241, 0.2);
+    border-top: 5px solid var(--cor-destaque);
+}
+
+.img-card {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border-bottom: 3px solid var(--cor-secundaria);
+}
+
+.card h3 {
+    margin-bottom: 15px;
+    color: var(--cor-secundaria);
+}
+
+.card p {
+    margin-bottom: 20px;
+    font-size: 15px;
+    color: #666;
+}
+
+.card .preco {
+    font-size: 22px;
+    font-weight: bold;
+    color: var(--cor-primaria);
+}
+
+/* =========================================
+   INTERFACE DO CHATBOT FLUTUANTE
+========================================= */
+.btn-toggle-chat {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    background: var(--gradiente-ia);
+    color: var(--cor-branca);
+    font-size: 30px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5);
+    z-index: 999;
+    transition: transform 0.3s ease;
+}
+
+.btn-toggle-chat:hover {
+    transform: scale(1.1);
+}
+
+.janela-chat {
+    position: fixed;
+    bottom: 110px;
+    right: 30px;
+    width: 350px;
+    height: 500px;
+    background-color: var(--cor-branca);
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 999;
+    border: 1px solid #e2e8f0;
+}
+
+.chat-header {
+    background: var(--gradiente-ia);
+    color: var(--cor-branca);
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-header h3 {
+    font-size: 16px;
+    margin: 0;
+}
+
+#btn-fechar-chat {
+    background: transparent;
+    border: none;
+    color: var(--cor-branca);
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.api-config-area {
+    background-color: #fffbeb;
+    padding: 10px;
+    border-bottom: 1px solid #fcd34d;
+}
+
+#api-key-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #fcd34d;
+    border-radius: 5px;
+    font-size: 12px;
+    outline: none;
+}
+
+.modelo-select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 8px;
+    border: 1px solid #fcd34d;
+    border-radius: 5px;
+    font-size: 12px;
+    outline: none;
+    background-color: var(--cor-branca);
+    color: var(--cor-texto);
+    cursor: pointer;
+}
+
+.chat-historico {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background-color: #f8fafc;
+}
+
+.mensagem {
+    max-width: 85%;
+    padding: 10px 15px;
+    border-radius: 12px;
+    font-size: 14px;
+    line-height: 1.4;
+    text-align: left;
+}
+
+.mensagem.usuario {
+    background: var(--cor-secundaria);
+    color: var(--cor-branca);
+    align-self: flex-end;
+    border-bottom-right-radius: 0;
+}
+
+.mensagem.ia {
+    background-color: #e2e8f0;
+    color: var(--cor-texto);
+    align-self: flex-start;
+    border-bottom-left-radius: 0;
+}
+
+/* =========================================
+   FAQ CHIPS (PERGUNTAS FREQUENTES)
+========================================= */
+.faq-sugestoes {
+    display: flex;
+    gap: 8px;
+    padding: 10px 15px;
+    background-color: var(--cor-branca);
+    border-top: 1px solid #e2e8f0;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.faq-sugestoes::-webkit-scrollbar {
+    display: none;
+}
+
+.btn-faq {
+    background-color: #f1f5f9;
+    color: var(--cor-texto);
+    border: 1px solid #cbd5e1;
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-faq:hover {
+    background-color: var(--cor-secundaria);
+    color: var(--cor-branca);
+    border-color: var(--cor-secundaria);
+}
+
+.chat-input-area {
+    display: flex;
+    padding: 15px;
+    background-color: var(--cor-branca);
+    border-top: 1px solid #e2e8f0;
+}
+
+#chat-input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    outline: none;
+    font-size: 14px;
+}
+
+#btn-enviar {
+    background: var(--cor-secundaria);
+    color: var(--cor-branca);
+    border: none;
+    padding: 0 15px;
+    margin-left: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+#btn-enviar:hover {
+    background: var(--cor-destaque);
+}
+
+/* =========================================
+   RODAPÉ
+========================================= */
+footer {
+    background-color: var(--cor-primaria);
+    color: var(--cor-branca);
+    text-align: center;
+    padding: 20px;
+}
+
+/* =========================================
+   RESPONSIVIDADE (Mobile)
+========================================= */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+        padding: 15px 20px;
+    }
+
+    nav ul {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    section {
+        padding: 50px 15px;
+    }
+
+    .hero h2 {
+        font-size: 26px;
+    }
+
+    .container-cards {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .card {
+        width: 100%;
+        max-width: 350px;
+    }
+
+    .janela-chat {
+        width: 90%;
+        right: 5%;
+        bottom: 100px;
+        height: 480px; /* Um pouco maior para caber os botões FAQ */
+    }
+}

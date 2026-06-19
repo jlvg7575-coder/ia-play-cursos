@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IA Play - Cursos de Inteligência Artificial</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- CABEÇALHO -->
+    <header>
+        <div class="logo">
+            <h1>🧠 IA Play Cursos</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Início</a></li>
+                <li><a href="sobre.html">Sobre</a></li>
+                <li><a href="index.html#modulos">Módulos</a></li>
+                <li><a href="contato.html">Contatos</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- SEÇÃO INÍCIO (HERO COM IMAGEM) -->
+        <section id="inicio" class="hero" style="display: flex; align-items: center; justify-content: center; gap: 40px; flex-wrap: wrap;">
+            <div style="max-width: 500px; text-align: left;">
+                <h2 style="font-size: 42px;">Domine a Inteligência Artificial do Zero</h2>
+                <p>Um curso prático e direto ao ponto para você aplicar IA, automatizar rotinas e analisar dados no seu dia a dia.</p>
+                <a href="index.html#modulos" class="btn-comprar">Ver Planos</a>
+            </div>
+            <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=500&q=80" alt="Conceito IA" style="width: 100%; max-width: 450px; border-radius: 20px; box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);">
+        </section>
+
+        <!-- SEÇÃO MÓDULOS (FLEXBOX COM IMAGENS) -->
+        <section id="modulos" class="modulos">
+            <h2>Nossos Módulos</h2>
+            <div class="container-cards">
+                <div class="card">
+                    <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=300&q=80" alt="Básico" class="img-card">
+                    <h3>Módulo Básico</h3>
+                    <p>Introdução às principais ferramentas de IA generativa do mercado.</p>
+                    <span class="preco">R$ 97,00</span>
+                </div>
+                <div class="card">
+                    <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=300&q=80" alt="Pro" class="img-card">
+                    <h3>Módulo Pro</h3>
+                    <p>Criação de prompts avançados e automação de tarefas diárias.</p>
+                    <span class="preco">R$ 147,00</span>
+                </div>
+                <div class="card">
+                    <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=300&q=80" alt="Expert" class="img-card">
+                    <h3>Módulo Expert</h3>
+                    <p>Integração de APIs e desenvolvimento de assistentes virtuais.</p>
+                    <span class="preco">R$ 297,00</span>
+                </div>
+                <div class="card">
+                    <img src="https://rickconlee.com/wp-content/uploads/2022/09/python-scripts-scaled-1-1200x800.webp" alt="Python" class="img-card">
+                    <h3>Módulo Automação (Python/SQL)</h3>
+                    <p>Desenvolva scripts e consultas SQL para automatizar planilhas e rotinas.</p>
+                    <span class="preco">R$ 197,00</span>
+                </div>
+                <div class="card">
+                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=300&q=80" alt="Dados" class="img-card">
+                    <h3>Módulo Auditoria de Dados</h3>
+                    <p>Uso de IA para cruzamento de dados, relatórios gerenciais e inconsistências.</p>
+                    <span class="preco">R$ 247,00</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- RODAPÉ -->
+    <footer>
+        <p>&copy; 2026 IA Play Cursos - Projeto Acadêmico.</p>
+    </footer>
+
+    <!-- CHATBOT FLUTUANTE -->
+    <div class="chatbot-container">
+        <button id="btn-toggle-chat" class="btn-toggle-chat">🤖</button>
+        <div id="janela-chat" class="janela-chat" style="display: none;">
+            <div class="chat-header">
+                <h3>Suporte IA Play</h3>
+                <button id="btn-fechar-chat">✖</button>
+            </div>
+            
+            <div class="api-config-area">
+                <input type="password" id="api-key-input" placeholder="Cole sua API Key (AIza...) aqui..." autocomplete="off">
+                <select id="modelo-select" class="modelo-select">
+                    <option value="gemini-3.5-flash">Modelo: Gemini 3.5 Flash (Lançamento 2026)</option>
+                    <option value="gemini-2.5-flash">Modelo: Gemini 2.5 Flash (Estável)</option>
+                </select>
+            </div>
+
+            <div id="chat-historico" class="chat-historico">
+                <div class="mensagem ia">Olá! Sou o assistente virtual do IA Play. Como posso ajudar com os nossos cursos hoje?</div>
+            </div>
+            
+            <!-- BOTÕES DE FAQ -->
+            <div class="faq-sugestoes">
+                <button class="btn-faq">Quais são os cursos?</button>
+                <button class="btn-faq">Qual o valor do Módulo Automação?</button>
+                <button class="btn-faq">Como funciona o suporte?</button>
+            </div>
+
+            <div class="chat-input-area">
+                <input type="text" id="chat-input" placeholder="Digite sua dúvida..." autocomplete="off">
+                <button id="btn-enviar">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
