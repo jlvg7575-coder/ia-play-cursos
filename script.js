@@ -106,7 +106,7 @@ async function enviarMensagemParaIA(mensagemUsuario) {
 
     try {
         // AGORA O JAVASCRIPT CHAMA O SEU PRÓPRIO SERVIDOR FLASK!
-        const API_BACKEND_CHAT = 'http://127.0.0.1:5000/chat';
+        const API_BACKEND_CHAT = 'https://ia-play-cursos.onrender.com/chat';
 
         const resposta = await fetch(API_BACKEND_CHAT, {
             method: 'POST',
@@ -183,7 +183,7 @@ botoesFaq.forEach(botao => {
 async function enviarParaBancoDeDados(dadosDoLead) {
     // URL local temporária para a fase de testes. 
     // Quando fizermos o deploy no Render, trocaremos para a URL de produção (ex: https://iaplay-api.onrender.com/leads)
-    const API_BACKEND_URL = 'http://127.0.0.1:5000/leads'; 
+    const API_BACKEND_URL = 'https://ia-play-cursos.onrender.com/leads'; 
 
     try {
         console.log("Enviando dados do lead para a API Flask...", dadosDoLead);
