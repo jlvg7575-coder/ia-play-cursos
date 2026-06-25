@@ -62,6 +62,27 @@ nav ul li a:hover {
 }
 
 /* =========================================
+   MENU HAMBÚRGUER (Escondido no Desktop)
+========================================= */
+.menu-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 101; 
+}
+
+.menu-toggle .bar {
+    width: 25px;
+    height: 3px;
+    background-color: var(--cor-branca);
+    transition: all 0.3s ease;
+    border-radius: 2px;
+}
+
+/* =========================================
    SEÇÕES PRINCIPAIS E BOTÕES
 ========================================= */
 section {
@@ -131,14 +152,15 @@ section h2 {
 }
 
 /* =========================================
-   CARDS DE PRODUTOS (FLEXBOX)
+   CARDS DE PRODUTOS (FLEXBOX 3x2)
 ========================================= */
 .container-cards {
     display: flex;
     justify-content: center;
     gap: 30px;
     flex-wrap: wrap;
-    margin-top: 40px;
+    margin: 40px auto 0;
+    max-width: 960px; /* Trava a largura máxima para 3 cards */
 }
 
 .card {
@@ -186,29 +208,80 @@ section h2 {
 }
 
 /* =========================================
-   INTERFACE DO CHATBOT FLUTUANTE
+   WIDGET FLUTUANTE DA MIA (TAMANHO AMPLIADO)
 ========================================= */
-.btn-toggle-chat {
+.widget-mia-flutuante {
     position: fixed;
     bottom: 30px;
     right: 30px;
-    width: 65px;
-    height: 65px;
-    border-radius: 50%;
-    background: var(--gradiente-ia);
-    color: var(--cor-branca);
-    font-size: 30px;
-    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     cursor: pointer;
-    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5);
     z-index: 999;
-    transition: transform 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+    user-select: none;
 }
 
-.btn-toggle-chat:hover {
-    transform: scale(1.1);
+.widget-mia-flutuante:active {
+    transform: scale(0.95);
 }
 
+.balao-fala {
+    background: var(--cor-branca);
+    color: var(--cor-texto);
+    padding: 10px 15px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: bold;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    margin-bottom: 12px;
+    position: relative;
+    text-align: center;
+    max-width: 150px;
+    animation: pulsar-balao 3s infinite;
+    transition: opacity 0.5s ease; 
+    border: 2px solid var(--cor-secundaria);
+}
+
+.balao-fala::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 8px 8px 0;
+    border-style: solid;
+    border-color: var(--cor-secundaria) transparent transparent transparent;
+}
+
+.mia-widget-img {
+    width: 120px !important;  
+    height: 120px !important; 
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--cor-branca);
+    box-shadow: 0 10px 30px rgba(99, 102, 241, 0.5);
+    animation: acenar-flutuar 3.5s ease-in-out infinite;
+    display: block;
+}
+
+@keyframes acenar-flutuar {
+    0% { transform: translateY(0px) rotate(0deg); }
+    25% { transform: translateY(-8px) rotate(8deg); }
+    50% { transform: translateY(-12px) rotate(-5deg); }
+    75% { transform: translateY(-8px) rotate(8deg); }
+    100% { transform: translateY(0px) rotate(0deg); }
+}
+
+@keyframes pulsar-balao {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* =========================================
+   JANELA DO CHAT
+========================================= */
 .janela-chat {
     position: fixed;
     bottom: 110px;
@@ -232,6 +305,21 @@ section h2 {
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+/* Bolinha Verde Piscante */
+.status-online-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background-color: #22c55e;
+    border-radius: 50%;
+    animation: piscar 2s infinite;
+}
+
+@keyframes piscar {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
 }
 
 .chat-header h3 {
@@ -308,9 +396,6 @@ section h2 {
     border-bottom-left-radius: 0;
 }
 
-/* =========================================
-   FAQ CHIPS (PERGUNTAS FREQUENTES)
-========================================= */
 .faq-sugestoes {
     display: flex;
     gap: 8px;
@@ -374,9 +459,6 @@ section h2 {
     background: var(--cor-destaque);
 }
 
-/* =========================================
-   RODAPÉ
-========================================= */
 footer {
     background-color: var(--cor-primaria);
     color: var(--cor-branca);
@@ -389,16 +471,47 @@ footer {
 ========================================= */
 @media (max-width: 768px) {
     header {
-        flex-direction: column;
-        gap: 15px;
-        text-align: center;
+        flex-direction: row; 
+        justify-content: space-between;
         padding: 15px 20px;
     }
 
+    .menu-toggle {
+        display: flex; 
+    }
+
+    #nav-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: var(--gradiente-ia);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        overflow: hidden;
+        max-height: 0; 
+        transition: max-height 0.3s ease-in-out;
+    }
+
+    #nav-menu.ativo {
+        max-height: 300px; 
+    }
+
     nav ul {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 10px;
+        flex-direction: column;
+        width: 100%;
+        padding: 20px 0;
+        gap: 20px;
+        text-align: center;
+    }
+    
+    .menu-toggle.ativo .bar:nth-child(1) {
+        transform: translateY(8px) rotate(45deg);
+    }
+    .menu-toggle.ativo .bar:nth-child(2) {
+        opacity: 0;
+    }
+    .menu-toggle.ativo .bar:nth-child(3) {
+        transform: translateY(-8px) rotate(-45deg);
     }
 
     section {
@@ -431,7 +544,125 @@ footer {
     .janela-chat {
         width: 90%;
         right: 5%;
-        bottom: 100px;
-        height: 480px; /* Um pouco maior para caber os botões FAQ */
+        bottom: 120px;
+        height: 480px; 
     }
+
+    .widget-mia-flutuante {
+        bottom: 20px;
+        right: 20px;
+    }
+    
+    .mia-widget-img {
+        width: 90px !important;  
+        height: 90px !important; 
+    }
+}
+
+/* =========================================
+   PAINEL ADMIN (GESTAO DE LEADS)
+========================================= */
+.tabela-admin {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--cor-branca);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 20px;
+}
+
+.tabela-admin th, .tabela-admin td {
+    padding: 15px 20px;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 14px;
+}
+
+.tabela-admin th {
+    background-color: var(--cor-primaria);
+    color: var(--cor-branca);
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 13px;
+    letter-spacing: 1px;
+}
+
+.tabela-admin tr:hover {
+    background-color: #f8fafc;
+}
+
+.btn-acao {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+    transition: 0.3s;
+    margin-right: 5px;
+}
+
+.btn-editar { background-color: #f59e0b; }
+.btn-editar:hover { background-color: #d97706; }
+
+.btn-excluir { background-color: #ef4444; }
+.btn-excluir:hover { background-color: #dc2626; }
+
+/* =========================================
+   FUNDOS COM IMAGENS E EFEITO OVERLAY (HERO)
+========================================= */
+/* 1. Fundo da Página Início */
+.hero-bg-index {
+    background: linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.95)), url('https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&w=1920&q=80');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed; /* Cria o efeito Parallax */
+    color: var(--cor-branca);
+}
+.hero-bg-index h2, .hero-bg-index p {
+    color: var(--cor-branca);
+}
+
+/* 2. Fundo da Página Sobre */
+.hero-bg-sobre {
+    background: linear-gradient(rgba(15, 23, 42, 0.8), rgba(99, 102, 241, 0.8)), url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1920&q=80');
+    background-size: cover;
+    background-position: center;
+    color: var(--cor-branca);
+    min-height: 50vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.hero-bg-sobre h2, .hero-bg-sobre strong, .hero-bg-sobre p {
+    color: var(--cor-branca);
+}
+
+/* 3. Fundo da Página de Contato */
+.hero-bg-contato {
+    background: linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.9)), url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1920&q=80');
+    background-size: cover;
+    background-position: center;
+    color: var(--cor-branca);
+}
+.hero-bg-contato h2, .hero-bg-contato h3, .hero-bg-contato p {
+    color: var(--cor-branca);
+}
+
+/* Efeito "Glassmorphism" (Vidro Fosco) para os cards de contato */
+.box-contato {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 30px;
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    flex: 1;
+    min-width: 250px;
+    transition: transform 0.3s ease;
+}
+.box-contato:hover {
+    transform: translateY(-5px);
 }

@@ -33,92 +33,129 @@ function adicionarMensagem(texto, remetente) {
 // 4. HISTÓRICO DA CONVERSA (mantém contexto entre mensagens, incluindo o nome do visitante)
 let historicoConversa = [];
 
-// 4.1 INSTRUÇÃO DE SISTEMA (persona, regras de escopo e detalhamento dos módulos)
+// 4.1 INSTRUÇÃO DE SISTEMA (persona acolhedora, regras e qualificação)
 const instrucaoSistema = `
-Você é a Mia, assistente virtual de vendas da IA Play Cursos. Seu tom é caloroso, ágil e prestativo.
+Você é a Mia, a assistente virtual super acolhedora, simpática e atenciosa da IA Play Cursos.
+Seu objetivo principal é prestar um suporte excelente, tirar dúvidas com carinho e atuar como agente de qualificação, coletando dados do visitante.
 
-REGRA DE ESCOPO (NUNCA QUEBRE):
-- Você só pode falar sobre a IA Play Cursos: seus módulos, preços, benefícios, processo de matrícula e dúvidas relacionadas ao site.
-- Se o visitante perguntar algo fora desse escopo (ex.: assuntos pessoais, notícias, outros produtos), responda de forma simpática e redirecione: "Foco apenas na IA Play! Posso te contar mais sobre nossos módulos?"
+COMPORTAMENTO E PERSONALIDADE (IMPORTANTE):
+- Seja extremamente acolhedora. Demonstre sempre que está feliz em ajudar.
+- Se o usuário falar sobre assuntos fora do escopo da escola (ex: futebol, filmes, clima, curiosidades), seja criativa e brincalhona para trazer o assunto de volta. 
+- Exemplo de como agir: Se falarem de futebol, responda algo como "Futebol é muito bom! Mas sabe o que é melhor ainda? Fazer um golaço na sua carreira aprendendo automação com os cursos da IA Play! Posso te apresentar nossos módulos?". Nunca seja rude ao cortar um assunto.
 
-COMPORTAMENTO CONVERSACIONAL:
-- Se esta for a primeira mensagem da conversa, apresente-se em uma frase e pergunte o nome do visitante antes de seguir com a explicação.
-- Depois que o visitante informar o nome, use-o nas respostas seguintes para tornar o atendimento mais pessoal.
-- Se o visitante agradecer (ex.: "obrigado", "valeu", "show", "ajudou muito"), responda de forma calorosa, agradeça também e pergunte se há algo mais em que possa ajudar. Nunca ignore um agradecimento nem o trate como assunto fora do escopo.
-- Mantenha as respostas diretas e sem parágrafos longos.
+DADOS OBRIGATÓRIOS PARA COLETAR NO MEIO DA CONVERSA (um por vez):
+1. Nome
+2. Qual a dúvida ou demanda (problema que quer resolver)
+3. Módulo de interesse (Básico, Pro, Expert, Automação Python/SQL, Auditoria de Dados ou Criação de Conteúdo)
+4. E-mail de contato (Valide se o formato possui '@').
 
-NOSSOS MÓDULOS (detalhe sempre que perguntado, sem inventar informações além destas):
-- Módulo Básico (R$ 97): introdução às principais ferramentas de IA generativa do mercado, lógica de prompts e primeiros passos práticos. Ideal para quem nunca usou IA no dia a dia.
-- Módulo Pro (R$ 147): criação de prompts avançados e automação de tarefas diárias, aprofundando o uso estratégico das ferramentas de IA. Indicado para quem já tem uma base e quer ganhar produtividade.
-- Módulo Expert (R$ 297): integração de APIs e desenvolvimento de assistentes virtuais próprios, incluindo deploy de projetos reais. Para quem quer construir um portfólio técnico.
-- Módulo Automação - Python/SQL (R$ 197): scripts em Python e consultas SQL para automatizar planilhas e rotinas repetitivas. Ótimo para quem trabalha com dados e processos no dia a dia.
-- Módulo Auditoria de Dados (R$ 247): uso de IA para cruzamento de dados, geração de relatórios gerenciais e identificação de inconsistências. Indicado para analistas e auditores.
+FINALIZAÇÃO DA QUALIFICAÇÃO (MUITO IMPORTANTE):
+Assim que coletar os 4 dados obrigatórios, despeça-se de forma muito calorosa informando que nossa equipe entrará em contato.
+Na mesma resposta, pule duas linhas e adicione EXATAMENTE o bloco abaixo (sem markdown extra):
+[LEAD_QUALIFICADO]
+{"nome": "nome", "email": "email", "modulo_interesse": "modulo", "descricao_demanda": "problema"}
 `;
+
+// 4.2 PLANO DE CONTINGÊNCIA (Fallback caso a API do Gemini falhe)
+function gerarRespostaContingencia(mensagem) {
+    // Transforma tudo em letras minúsculas para facilitar a busca pelas palavras
+    const texto = mensagem.toLowerCase(); 
+
+    // Saudações e Educação
+    if (texto.includes('bom dia') || texto.includes('boa tarde') || texto.includes('boa noite') || texto.includes('olá') || texto.includes('oi')) {
+        return "Olá! Sou a Mia. Meus servidores de IA estão com alta demanda agora, mas continuo aqui para ajudar! Qual módulo da IA Play Cursos mais te interessa?";
+    }
+    else if (texto.includes('obrigado') || texto.includes('valeu') || texto.includes('agradeço')) {
+        return "Por nada! Estou sempre à disposição. Mais alguma dúvida sobre os nossos cursos?";
+    }
+    // Palavras-chave dos Módulos
+    else if (texto.includes('básico') || texto.includes('basico')) {
+        return "O Módulo Básico custa R$ 97,00 e é o passo inicial perfeito no mundo da IA. Quer deixar seu nome e e-mail para nossa equipe te chamar?";
+    }
+    else if (texto.includes('pro')) {
+        return "O Módulo Pro (R$ 147,00) foca na criação de prompts avançados e automação. Gostaria de se matricular? Deixe seu e-mail de contato!";
+    }
+    else if (texto.includes('expert')) {
+        return "O Módulo Expert (R$ 297,00) é incrível para aprender a criar assistentes virtuais e integrar APIs! Pode me informar seu e-mail para mais detalhes?";
+    }
+    else if (texto.includes('automação') || texto.includes('automacao') || texto.includes('python') || texto.includes('sql')) {
+        return "O Módulo Automação (Python/SQL) sai por R$ 197,00 e vai automatizar todas as suas planilhas. Qual o seu e-mail para um consultor falar com você?";
+    }
+    else if (texto.includes('dados') || texto.includes('auditoria')) {
+        return "O Módulo Auditoria de Dados custa R$ 247,00 e ensina a cruzar relatórios usando IA. Quer deixar o seu e-mail de contato?";
+    }
+    else if (texto.includes('conteúdo') || texto.includes('conteudo') || texto.includes('marketing')) {
+        return "O Módulo Criação de Conteúdo (R$ 127,00) é ideal para planejar campanhas e roteiros ágeis. Posso anotar seu e-mail para dar andamento?";
+    }
+    // Caso a pergunta fuja das palavras-chave mapeadas (O "Else" final)
+    else {
+        return "No momento estou operando no modo de segurança e só posso me direcionar a assuntos da IA Play Cursos! Gostaria de saber sobre nossos módulos: Básico, Pro, Expert, Automação, Dados ou Conteúdo?";
+    }
+}
 
 // 5. FUNÇÃO PRINCIPAL DE COMUNICAÇÃO (Assíncrona)
 async function enviarMensagemParaIA(mensagemUsuario) {
-    const apiKeyManual = apiKeyInput.value.trim();
-    const modeloEscolhido = modeloSelect.value; 
-
-    if (!apiKeyManual) {
-        adicionarMensagem("Por favor, cole a sua API Key do Google (AIza...) no campo superior amarelo antes de conversar comigo!", "ia");
-        return;
-    }
-
+    // 1. Mostra a mensagem na tela
     adicionarMensagem(mensagemUsuario, 'usuario');
     chatInput.value = ''; 
 
+    // 2. Cria o balão de "Digitando..."
     adicionarMensagem('Digitando...', 'ia');
     const baloes = chatHistorico.getElementsByClassName('mensagem ia');
     const balaoCarregando = baloes[baloes.length - 1];
 
     try {
-        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${modeloEscolhido}:generateContent?key=${apiKeyManual}`;
+        // AGORA O JAVASCRIPT CHAMA O SEU PRÓPRIO SERVIDOR FLASK!
+        const API_BACKEND_CHAT = 'http://127.0.0.1:5000/chat';
 
-        // Monta o histórico completo da conversa + a nova mensagem do usuário
-        const conteudoAtual = [
-            ...historicoConversa,
-            { role: 'user', parts: [{ text: mensagemUsuario }] }
-        ];
-
-        const requestBody = {
-            systemInstruction: { parts: [{ text: instrucaoSistema }] },
-            contents: conteudoAtual,
-            generationConfig: {
-                maxOutputTokens: 300,
-                temperature: 0.4
-            }
-        };
-
-        const resposta = await fetch(API_URL, {
+        const resposta = await fetch(API_BACKEND_CHAT, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(requestBody)
+            body: JSON.stringify({
+                mensagem: mensagemUsuario,
+                historico: historicoConversa,
+                instrucao: instrucaoSistema
+            })
         });
 
-        if (!resposta.ok) {
-            throw new Error(`Status HTTP do Google: ${resposta.status}`);
-        }
+        if (!resposta.ok) throw new Error(`Status HTTP: ${resposta.status}`);
 
         const dados = await resposta.json();
-        const textoIA = dados.candidates[0].content.parts[0].text;
+        let textoIA = dados.resposta;
 
+        // INTERCEPTAÇÃO DOS DADOS DO LEAD (Continua igual!)
+        if (textoIA.includes('[LEAD_QUALIFICADO]')) {
+            const partes = textoIA.split('[LEAD_QUALIFICADO]');
+            textoIA = partes[0].trim(); 
+            const jsonString = partes[1].trim(); 
+            
+            try {
+                const dadosDoLead = JSON.parse(jsonString);
+                console.log("SUCESSO! Lead qualificado pela IA:", dadosDoLead);
+                enviarParaBancoDeDados(dadosDoLead); 
+            } catch (erroJson) {
+                console.error("Erro ao extrair dados do lead:", erroJson);
+            }
+        }
+
+        // Atualiza a tela e o histórico
         balaoCarregando.textContent = textoIA;
-
-        // Atualiza o histórico (mantém memória do nome e do contexto para a próxima pergunta)
         historicoConversa.push({ role: 'user', parts: [{ text: mensagemUsuario }] });
         historicoConversa.push({ role: 'model', parts: [{ text: textoIA }] });
 
     } catch (erro) {
-        console.error("Erro detalhado:", erro);
+        console.error("Erro na API Backend:", erro);
         
-        // PLANO B PARA O SEMINÁRIO (Graceful Degradation)
-        // Se a API do Google cair, o bot dá uma resposta programada, salvando a apresentação.
-        balaoCarregando.textContent = "Nossos servidores de IA estão com alta demanda no momento! Mas não se preocupe: todos os detalhes dos nossos planos estão na seção 'Módulos' logo acima. Recomendo o Módulo Automação (Python/SQL). Posso ajudar com mais alguma coisa?";
+        // 🚀 CONTINGÊNCIA CONTINUA FUNCIONANDO SE A API CAIR
+        const respostaFallback = gerarRespostaContingencia(mensagemUsuario);
+        balaoCarregando.textContent = respostaFallback;
+
+        historicoConversa.push({ role: 'user', parts: [{ text: mensagemUsuario }] });
+        historicoConversa.push({ role: 'model', parts: [{ text: respostaFallback }] });
     }
 }
 
-// 5. EVENTOS DE CLIQUE E TECLADO (Input normal)
+// 6. EVENTOS DE CLIQUE E TECLADO (Input normal)
 btnEnviar.addEventListener('click', () => {
     const texto = chatInput.value.trim();
     if (texto !== '') {
@@ -132,7 +169,7 @@ chatInput.addEventListener('keypress', (e) => {
     }
 });
 
-// 6. EVENTOS DOS BOTÕES DE FAQ (QUICK REPLIES)
+// 7. EVENTOS DOS BOTÕES DE FAQ (QUICK REPLIES)
 const botoesFaq = document.querySelectorAll('.btn-faq');
 
 botoesFaq.forEach(botao => {
@@ -140,4 +177,82 @@ botoesFaq.forEach(botao => {
         const perguntaFaq = botao.textContent;
         enviarMensagemParaIA(perguntaFaq);
     });
+});
+
+// 8. FUNÇÃO PARA ENVIAR DADOS AO BACKEND (FLASK / NEON)
+async function enviarParaBancoDeDados(dadosDoLead) {
+    // URL local temporária para a fase de testes. 
+    // Quando fizermos o deploy no Render, trocaremos para a URL de produção (ex: https://iaplay-api.onrender.com/leads)
+    const API_BACKEND_URL = 'http://127.0.0.1:5000/leads'; 
+
+    try {
+        console.log("Enviando dados do lead para a API Flask...", dadosDoLead);
+        
+        const resposta = await fetch(API_BACKEND_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            // Converte o objeto JavaScript de volta para uma string JSON antes de enviar
+            body: JSON.stringify(dadosDoLead) 
+        });
+
+        if (!resposta.ok) {
+            throw new Error(`Erro na API do Backend: ${resposta.status}`);
+        }
+
+        const resultado = await resposta.json();
+        console.log("Sucesso! Lead salvo no banco de dados NEON:", resultado);
+
+    } catch (erro) {
+        console.error("Falha ao salvar o lead no banco de dados:", erro);
+    }
+}
+
+// 9. MENU HAMBÚRGUER (MOBILE)
+const menuToggle = document.getElementById('mobile-menu');
+const navMenu = document.getElementById('nav-menu');
+
+if (menuToggle && navMenu) {
+    menuToggle.addEventListener('click', () => {
+        // Alterna a classe 'ativo' no botão e no menu
+        menuToggle.classList.toggle('ativo');
+        navMenu.classList.toggle('ativo');
+    });
+}
+
+// 10. LÓGICA DO BALÃOZINHO ANIMADO (WIDGET FLUTUANTE)
+const balaoFala = document.getElementById('balao-fala');
+const mensagensBalao = [
+    "Olá! Dúvidas? É só chamar! 👋",
+    "Quer automatizar sua rotina? ⚙️",
+    "Estou online agora! 🟢",
+    "Clique aqui para falar comigo! 🧠"
+];
+let indexMensagem = 0;
+
+if (balaoFala) {
+    setInterval(() => {
+        // Passo 1: Fica transparente
+        balaoFala.style.opacity = '0';
+        
+        setTimeout(() => {
+            // Passo 2: Troca a mensagem de forma invisível
+            indexMensagem = (indexMensagem + 1) % mensagensBalao.length;
+            balaoFala.textContent = mensagensBalao[indexMensagem];
+            
+            // Passo 3: Volta a ficar visível
+            balaoFala.style.opacity = '1';
+        }, 500); // Espera meio segundo (tempo da transição CSS) para trocar o texto
+        
+    }, 4500); // Troca de frase a cada 4,5 segundos
+}
+
+// Opcional: Esconder o balão quando a janela de chat estiver aberta
+btnToggleChat.addEventListener('click', () => {
+    if (janelaChat.style.display === 'flex') {
+        balaoFala.style.display = 'none'; // Esconde quando abre
+    } else {
+        balaoFala.style.display = 'block'; // Mostra quando fecha
+    }
 });
