@@ -20,9 +20,13 @@
     </header>
 
     <main style="padding: 40px 20px; max-width: 1200px; margin: 0 auto; min-height: 80vh;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
             <h2 style="color: var(--cor-primaria); font-size: 28px; margin: 0;">Gestão de Leads (Pré-Matrículas)</h2>
-            <button onclick="carregarLeads()" class="btn-comprar" style="padding: 10px 20px; font-size: 14px;">Atualizar Dados</button>
+            
+            <div style="display: flex; gap: 10px;">
+                <button onclick="carregarLeads()" class="btn-comprar" style="padding: 10px 20px; font-size: 14px;">Atualizar Dados</button>
+                <button onclick="sairPainel()" class="btn-acao btn-excluir" style="padding: 10px 20px; font-size: 14px; border-radius: 30px;">Sair</button>
+            </div>
         </div>
         
         <div style="overflow-x: auto;">
@@ -44,22 +48,43 @@
     </main>
 
     <footer style="margin-top: auto;">
-        <p>&copy; 2026 IA Play Cursos - Sistema de Gestão Interna</p>
+        <p>&copy; 2026 IA Play Cursos - Sistema de Gestão Interna Restrita</p>
     </footer>
 
     <script>
-        // O endereço da sua API Flask que está rodando no terminal
         const API_URL = 'https://ia-play-cursos.onrender.com/leads';
 
-        // 1. LER (READ - GET)
+        // 1. VERIFICAÇÃO DE SEGURANÇA: Checa se o usuário tem o "crachá"
+        const token = localStorage.getItem('adminToken');
+        if (!token) {
+            window.location.href = 'login.html'; // Expulsa para o login se não tiver senha
+        }
+
+        // Função para Deslogar
+        function sairPainel() {
+            localStorage.removeItem('adminToken');
+            window.location.href = 'login.html';
+        }
+
+        // 2. LER DADOS (Com a senha embutida no cabeçalho)
         async function carregarLeads() {
             try {
-                const resposta = await fetch(API_URL);
+                const resposta = await fetch(API_URL, {
+                    headers: { 'X-Admin-Token': token } // Enviando o crachá de segurança
+                });
+                
+                // Se o Python barrar (Erro 403), devolve para o login
+                if (resposta.status === 403) {
+                    alert("Acesso negado: Sessão expirada ou senha inválida.");
+                    sairPainel();
+                    return;
+                }
+                
                 if (!resposta.ok) throw new Error("Erro ao buscar dados no servidor.");
                 
                 const leads = await resposta.json();
                 const tbody = document.getElementById('tabela-corpo');
-                tbody.innerHTML = ''; // Limpa a tabela antes de popular
+                tbody.innerHTML = ''; 
                 
                 leads.forEach(lead => {
                     const tr = document.createElement('tr');
@@ -78,22 +103,25 @@
                 });
             } catch (erro) {
                 console.error(erro);
-                alert("Falha ao carregar os leads. Verifique se o servidor Flask está rodando.");
+                alert("Falha ao carregar a tabela. Verifique sua conexão com o servidor.");
             }
         }
 
-        // 2. ATUALIZAR (UPDATE - PUT)
+        // 3. ATUALIZAR (Com senha)
         async function editarLead(id, nomeAtual, moduloAtual) {
             const novoNome = prompt("Corrigir o nome do lead:", nomeAtual);
-            if (novoNome === null) return; // Cancelou
+            if (!novoNome) return; 
 
             const novoModulo = prompt("Alterar módulo de interesse:", moduloAtual);
-            if (novoModulo === null) return; // Cancelou
+            if (!novoModulo) return; 
             
             try {
                 const resposta = await fetch(`${API_URL}/${id}`, {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'X-Admin-Token': token 
+                    },
                     body: JSON.stringify({ 
                         nome: novoNome, 
                         modulo_interesse: novoModulo, 
@@ -102,7 +130,9 @@
                 });
 
                 if (resposta.ok) {
-                    carregarLeads(); // Recarrega a tabela para mostrar os dados novos
+                    carregarLeads(); 
+                } else if (resposta.status === 403) {
+                    alert("Operação bloqueada por segurança.");
                 } else {
                     alert("Erro ao editar lead.");
                 }
@@ -111,15 +141,21 @@
             }
         }
 
-        // 3. EXCLUIR (DELETE)
+        // 4. EXCLUIR (Com senha)
         async function deletarLead(id) {
             const confirmacao = confirm(`Atenção: Tem certeza que deseja apagar definitivamente o Lead #${id}?`);
             
             if (confirmacao) {
                 try {
-                    const resposta = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+                    const resposta = await fetch(`${API_URL}/${id}`, { 
+                        method: 'DELETE',
+                        headers: { 'X-Admin-Token': token }
+                    });
+                    
                     if (resposta.ok) {
-                        carregarLeads(); // Remove a linha excluída recarregando a tabela
+                        carregarLeads(); 
+                    } else if (resposta.status === 403) {
+                        alert("Operação bloqueada por segurança.");
                     } else {
                         alert("Erro ao excluir lead.");
                     }
@@ -129,7 +165,7 @@
             }
         }
 
-        // Assim que a página abre, ele chama a função para listar os dados
+        // Assim que a página abre, ele valida o token e chama a tabela
         window.onload = carregarLeads;
     </script>
 </body>

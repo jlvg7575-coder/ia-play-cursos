@@ -5,6 +5,7 @@ from flask_cors import CORS
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
+from functools import wraps
 
 # Carrega as variáveis de segurança do arquivo .env
 load_dotenv()
@@ -19,11 +20,28 @@ def get_db_connection():
     return conn
 
 # ==========================================
+# MIDDLEWARE DE SEGURANÇA (O PORTEIRO)
+# ==========================================
+def require_admin_token(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        token_enviado = request.headers.get('X-Admin-Token')
+        senha_correta = os.getenv('ADMIN_SECRET_TOKEN')
+        
+        # Se não enviou o crachá ou a senha for errada, barra o acesso
+        if not senha_correta or token_enviado != senha_correta:
+            return jsonify({"erro": "Acesso Negado: Credenciais inválidas."}), 403
+            
+        return f(*args, **kwargs)
+    return decorated_function
+
+# ==========================================
 # ROTAS DO CRUD COMPLETO (GESTAO DE LEADS)
 # ==========================================
 
-# 1. READ: Listar todos os leads (GET)
+# 1. READ: Listar todos os leads (GET) - ROTA PROTEGIDA
 @app.route('/leads', methods=['GET'])
+@require_admin_token
 def get_leads():
     conn = None
     cur = None
@@ -39,13 +57,12 @@ def get_leads():
         return jsonify({"erro": "Erro ao buscar os leads no banco de dados.", "detalhes": str(e)}), 500
         
     finally:
-        # FECHAMENTO GARANTIDO: Evita vazamento de conexões no Neon
         if cur:
             cur.close()
         if conn:
             conn.close()
 
-# 2. CREATE: Cadastrar um novo lead vindo da Mia (POST)
+# 2. CREATE: Cadastrar um novo lead vindo da Mia (POST) - ROTA LIVRE PARA O BOT
 @app.route('/leads', methods=['POST'])
 def add_lead():
     conn = None
@@ -53,13 +70,11 @@ def add_lead():
     try:
         dados = request.json
         
-        # NORMALIZAÇÃO DE DADOS SEGURA
         nome = dados.get('nome', '').strip().title()
         email = dados.get('email', '').strip().lower()
         modulo_interesse = dados.get('modulo_interesse', '').strip()
         descricao_demanda = dados.get('descricao_demanda', '').strip()
 
-        # VALIDAÇÃO: Impede salvar no banco se faltar nome ou email
         if not nome or not email:
             return jsonify({"erro": "Nome e e-mail são obrigatórios para o cadastro."}), 400
 
@@ -77,8 +92,7 @@ def add_lead():
         
     except Exception as e:
         if conn:
-            conn.rollback() # Cancela a transação se der erro
-        print(f"Erro ao inserir no banco: {e}") 
+            conn.rollback() 
         return jsonify({"erro": "Falha interna ao processar o cadastro do lead.", "detalhes": str(e)}), 500
         
     finally:
@@ -87,8 +101,9 @@ def add_lead():
         if conn:
             conn.close()
 
-# 3. UPDATE: Atualizar dados de um lead no painel admin (PUT)
+# 3. UPDATE: Atualizar dados de um lead (PUT) - ROTA PROTEGIDA
 @app.route('/leads/<int:id>', methods=['PUT'])
+@require_admin_token
 def update_lead(id):
     conn = None
     cur = None
@@ -98,7 +113,6 @@ def update_lead(id):
         modulo_interesse = dados.get('modulo_interesse', '').strip()
         urgencia = dados.get('urgencia', 'Normal').strip()
 
-        # VALIDAÇÃO: Impede o envio de dados vazios via requisição
         if not nome or not modulo_interesse:
             return jsonify({"erro": "Os campos 'nome' e 'modulo_interesse' não podem ficar vazios."}), 400
 
@@ -110,7 +124,6 @@ def update_lead(id):
             WHERE id = %s;
         ''', (nome, modulo_interesse, urgencia, id))
         
-        # VALIDAÇÃO: Verifica se o ID realmente existia no banco
         if cur.rowcount == 0:
             return jsonify({"erro": f"Lead com o ID {id} não foi encontrado no sistema."}), 404
             
@@ -128,8 +141,9 @@ def update_lead(id):
         if conn:
             conn.close()
 
-# 4. DELETE: Excluir um lead no painel admin (DELETE)
+# 4. DELETE: Excluir um lead (DELETE) - ROTA PROTEGIDA
 @app.route('/leads/<int:id>', methods=['DELETE'])
+@require_admin_token
 def delete_lead(id):
     conn = None
     cur = None
@@ -138,7 +152,6 @@ def delete_lead(id):
         cur = conn.cursor()
         cur.execute('DELETE FROM leads WHERE id = %s;', (id,))
         
-        # VALIDAÇÃO: Verifica se deletou algo ou se o ID nem existia
         if cur.rowcount == 0:
             return jsonify({"erro": f"Operação recusada: Lead {id} não existe."}), 404
             
@@ -167,7 +180,6 @@ def chat_gemini():
         historico = dados.get('historico', [])
         instrucao = dados.get('instrucao', '')
 
-        # Puxa todas as chaves de fallback de forma segura
         chaves_disponiveis = [
             os.getenv('GEMINI_API_KEY_1'),
             os.getenv('GEMINI_API_KEY_2')
@@ -186,7 +198,6 @@ def chat_gemini():
         }
 
         for api_key in api_keys:
-            # Rotação configurada para o modelo correto 2.5
             url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
             
             resposta = requests.post(url, json=payload, headers={'Content-Type': 'application/json'})
@@ -207,5 +218,4 @@ def chat_gemini():
 
     except Exception as e:
         print(f"Erro no chat: {e}")
-        # Retornando um erro mapeado como JSON para não quebrar o fetch() do JS
         return jsonify({"erro": "Erro interno de comunicação com a IA", "detalhes": str(e)}), 500
