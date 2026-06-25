@@ -147,7 +147,8 @@ def chat_gemini():
 
         # Tenta usar as chaves em ordem
         for api_key in api_keys:
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+            # Voltando para a versão correta 2.5 que você já usava!
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
             
             resposta = requests.post(url, json=payload, headers={'Content-Type': 'application/json'})
             
