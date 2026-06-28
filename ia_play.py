@@ -14,6 +14,13 @@ app = Flask(__name__)
 # O CORS permite que o seu JavaScript consiga enviar dados para esta API
 CORS(app)
 
+# ==========================================
+# ROTA DE PING (mantém o serviço acordado no plano free do Render)
+# ==========================================
+@app.route('/ping', methods=['GET'])
+def ping():
+    return jsonify({"status": "ok"}), 200
+
 # Função para conectar ao banco NEON
 def get_db_connection():
     conn = psycopg2.connect(os.getenv('DATABASE_URL'))
@@ -75,20 +82,34 @@ def add_lead():
         modulo_interesse = dados.get('modulo_interesse', '').strip()
         descricao_demanda = dados.get('descricao_demanda', '').strip()
 
+        # Urgência classificada pela própria Mia (Alta/Média/Baixa).
+        # Qualquer valor fora dessa lista cai em "Normal" para não
+        # quebrar a query nem o painel admin.
+        urgencia = (dados.get('urgencia') or 'Normal').strip().capitalize()
+        if urgencia not in ('Alta', 'Média', 'Baixa'):
+            urgencia = 'Normal'
+
         if not nome or not email:
             return jsonify({"erro": "Nome e e-mail são obrigatórios para o cadastro."}), 400
 
         conn = get_db_connection()
         cur = conn.cursor()
         cur.execute('''
-            INSERT INTO leads (nome, email, modulo_interesse, descricao_demanda)
-            VALUES (%s, %s, %s, %s) RETURNING id;
-        ''', (nome, email, modulo_interesse, descricao_demanda))
+            INSERT INTO leads (nome, email, modulo_interesse, descricao_demanda, urgencia)
+            VALUES (%s, %s, %s, %s, %s)
+            ON CONFLICT (email) DO UPDATE SET
+                nome = EXCLUDED.nome,
+                modulo_interesse = EXCLUDED.modulo_interesse,
+                descricao_demanda = EXCLUDED.descricao_demanda,
+                urgencia = EXCLUDED.urgencia,
+                data_cadastro = NOW()
+            RETURNING id;
+        ''', (nome, email, modulo_interesse, descricao_demanda, urgencia))
         
         novo_id = cur.fetchone()[0]
         conn.commit()
         
-        return jsonify({"mensagem": "Lead salvo e normalizado com sucesso!", "id": novo_id}), 201
+        return jsonify({"mensagem": "Lead salvo/atualizado com sucesso!", "id": novo_id}), 201
         
     except Exception as e:
         if conn:
@@ -194,7 +215,7 @@ def chat_gemini():
         payload = {
             "systemInstruction": {"parts": [{"text": instrucao}]},
             "contents": conteudo_atual,
-            "generationConfig": {"maxOutputTokens": 400, "temperature": 0.4}
+            "generationConfig": {"maxOutputTokens": 300, "temperature": 0.4}
         }
 
         for api_key in api_keys:
