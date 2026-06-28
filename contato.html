@@ -25,6 +25,7 @@
                 <li><a href="sobre.html">Sobre</a></li>
                 <li><a href="index.html#modulos">Módulos</a></li>
                 <li><a href="contato.html">Contatos</a></li>
+                <li><a href="login.html" style="color: #fcd34d;">🔒 Área Restrita</a></li>
             </ul>
         </nav>
     </header>
@@ -49,7 +50,7 @@
             </div>
 
             <hr style="border: 1px solid rgba(255,255,255,0.2); margin-bottom: 40px; max-width: 800px; margin-left: auto; margin-right: auto;">
-            <p>Clique no robô no canto inferior direito da tela para iniciar o atendimento inteligente.</p>
+            <p>Clique no balão no canto inferior direito da tela para iniciar o atendimento.</p>
         </section>
     </main>
 
@@ -57,41 +58,60 @@
         <p>&copy; 2026 IA Play Cursos - Atendimento Seg a Sex, das 08h às 18h.</p>
     </footer>
 
-    <div class="chatbot-container">
-        <div id="btn-toggle-chat" class="widget-mia-flutuante">
-            <div class="balao-fala" id="balao-fala">Olá! Dúvidas? É só chamar!</div>
-            <video src="mia.mp4" class="mia-widget-img" autoplay loop muted playsinline></video>
-        </div>
-        
-        <div id="janela-chat" class="janela-chat" style="display: none;">
-            
-            <div class="chat-header">
-                <div class="chat-perfil">
-                    <h3 style="margin: 0; font-size: 16px;">Mia - Suporte</h3>
-                    <span style="font-size: 11px; opacity: 0.9; display: flex; align-items: center; gap: 6px;">
-                        <span class="status-online-dot"></span> Online agora
-                    </span>
-                </div>
-                <button id="btn-fechar-chat" style="font-size: 20px;">✖</button>
-            </div>
+    <script src="menu.js"></script>
 
-            <div id="chat-historico" class="chat-historico">
-                <div class="mensagem ia">Olá! Sou a Mia, assistente virtual da IA Play Cursos. Qual é o seu nome?</div>
-            </div>
-            
-            <div class="faq-sugestoes">
-                <button class="btn-faq">Quais são os cursos?</button>
-                <button class="btn-faq">Qual o valor do Módulo Automação?</button>
-                <button class="btn-faq">Como funciona o suporte?</button>
-            </div>
-
-            <div class="chat-input-area">
-                <input type="text" id="chat-input" placeholder="Digite sua dúvida..." autocomplete="off">
-                <button id="btn-enviar">Enviar</button>
-            </div>
-        </div>
+    <div class="widget-mia-flutuante" id="icone-mia">
+        <div class="balao-fala">Oi! Posso ajudar?</div>
+        <video src="mia.mp4" class="mia-widget-img" autoplay loop muted playsinline></video>
     </div>
 
-    <script src="script.js"></script>
+    <div class="janela-chat" id="janela-bot" style="visibility: hidden; opacity: 0; pointer-events: none; transition: all 0.3s ease;">
+        <div class="chat-header">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="status-online-dot"></span>
+                <h3 style="margin: 0;">Mia - IA Play</h3>
+            </div>
+            <button id="btn-fechar-chat" style="background: none; border: none; color: white; font-size: 18px; cursor: pointer;">✖</button>
+        </div>
+        
+        <typebot-standard style="width: 100%; flex: 1; border-bottom-left-radius: 15px; border-bottom-right-radius: 15px;"></typebot-standard>
+    </div>
+
+    <script type="module">
+      import Typebot from 'https://cdn.jsdelivr.net/npm/@typebot.io/js@0/dist/web.js'
+
+      Typebot.initStandard({
+        typebot: "my-typebot-vj4rxm6",
+        theme: {
+          chatWindow: { backgroundColor: "#ffffff" }
+        }
+      });
+    </script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+          const iconeMia = document.getElementById('icone-mia');
+          const janelaBot = document.getElementById('janela-bot');
+          const btnFechar = document.getElementById('btn-fechar-chat');
+
+          if (iconeMia && janelaBot && btnFechar) {
+              iconeMia.addEventListener('click', () => {
+                  iconeMia.style.display = 'none'; 
+                  
+                  janelaBot.style.visibility = 'visible';
+                  janelaBot.style.opacity = '1';
+                  janelaBot.style.pointerEvents = 'auto';
+              });
+
+              btnFechar.addEventListener('click', () => {
+                  janelaBot.style.visibility = 'hidden';
+                  janelaBot.style.opacity = '0';
+                  janelaBot.style.pointerEvents = 'none';
+                  
+                  iconeMia.style.display = 'flex'; 
+              });
+          }
+      });
+    </script>
 </body>
 </html>
