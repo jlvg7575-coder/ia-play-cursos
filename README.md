@@ -46,4 +46,4 @@ A API desenvolvida em Flask expõe endpoints que consomem o banco NEON, garantin
 
 1. **Clone o repositório:**
    ```bash
-   git clone [https://github.com/jlvg7575-coder/ia-play-cursos.git](https://github.com/SEU_USUARIO/SEU_REPOSITORIO.git)
+   git clone [https://github.com/jlvg7575-coder/ia-play-cursos.git](https://github.com/jlvg7575-coder/ia-play-cursos.git)
