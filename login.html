@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acesso Restrito - IA Play</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body style="background-color: #f8fafc; display: flex; align-items: center; justify-content: center; height: 100vh;">
+
+    <div class="card" style="width: 100%; max-width: 400px; text-align: center;">
+        <h2 style="color: var(--cor-primaria); margin-bottom: 10px;">⚙️ Painel Admin</h2>
+        <p style="color: #666; font-size: 14px; margin-bottom: 25px;">Acesso restrito à gestão de leads.</p>
+        
+        <input type="password" id="senha-admin" placeholder="Digite a senha de acesso" style="width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none;">
+        
+        <button onclick="fazerLogin()" class="btn-comprar" style="width: 100%; border: none; cursor: pointer;">Entrar</button>
+        
+        <p id="erro-login" style="color: #ef4444; font-size: 13px; margin-top: 15px; display: none; font-weight: bold;">Senha incorreta ou acesso negado.</p>
+        
+        <a href="index.html" style="display: block; margin-top: 20px; color: var(--cor-secundaria); text-decoration: none; font-size: 14px; font-weight: bold;">← Voltar ao site principal</a>
+    </div>
+
+    <script>
+        function fazerLogin() {
+            const senha = document.getElementById('senha-admin').value;
+            if (senha.trim() === "") return;
+            
+            // O Front-end guarda a senha como se fosse um crachá de acesso
+            localStorage.setItem('adminToken', senha);
+            
+            // Redireciona para o painel
+            window.location.href = 'admin.html';
+        }
+    </script>
+
+</body>
+</html>
